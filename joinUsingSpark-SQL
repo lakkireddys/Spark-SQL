@@ -7,5 +7,12 @@ supplierDF: org.apache.spark.sql.DataFrame = [supplierid: int, name: string, pho
 scala> val joinDF = supplierDF.join(productDF, "supplierid").select(supplierDF("name") as "supplierName",productDF("name") as "productName", productDF("price") as "price").filter($"price"<=0.60)
 joinDF: org.apache.spark.sql.DataFrame = [supplierName: string, productName: string, price: double]
 
+
+Best practices are :
+      Filter out the data before you do join to reduce the data shuffling
+        val joinDF = productDF.filter($"price"<=0.60)
+                              .join(supplierDF, "supplierid")
+                              .select(supplierDF("name") as "supplierName",productDF("name") as "productName", productDF("price") as "price")
+
 scala> joinDF.repartition(1).rdd.saveAsTextFile("file:///home/lakki/practice/results")
 
