@@ -1,0 +1,11 @@
+scala> valproductDF=sqlContext.read.option("header","true").format("csv").option("inferSchema","true").load("file:///home/lakki/practice/product.csv")l 
+productDF: org.apache.spark.sql.DataFrame = [productID: int, productCode: string, name: string, quantity: int, price: double, supplierid: int]
+
+scala> val supplierDF=sqlContext.read.option("header","true").format("csv").option("inferSchema","true").load("file:///home/lakki/practice/supplier.csv")
+supplierDF: org.apache.spark.sql.DataFrame = [supplierid: int, name: string, phone: int]
+
+scala> val joinDF = supplierDF.join(productDF, "supplierid").select(supplierDF("name") as "supplierName",productDF("name") as "productName", productDF("price") as "price").filter($"price"<=0.60)
+joinDF: org.apache.spark.sql.DataFrame = [supplierName: string, productName: string, price: double]
+
+scala> joinDF.repartition(1).rdd.saveAsTextFile("file:///home/lakki/practice/results")
+
